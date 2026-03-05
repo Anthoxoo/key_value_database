@@ -1,4 +1,6 @@
-use key_value_database::{Command, insert, parse_args, remove, select};
+use key_value_database::{
+    Command, database_to_map, insert, leave_database, parse_args, remove, select,
+};
 use std::env;
 
 fn main() {
@@ -12,9 +14,12 @@ fn main() {
         }
     };
 
-    match command {
-        Command::Insert(target, value) => insert(&target, &value),
-        Command::Remove(target) => remove(&target),
-        Command::Select() => select(),
-    }
+    let mut map = database_to_map();
+
+    map = match command {
+        Command::Insert(target, value) => insert(&map, &target, &value),
+        Command::Remove(target) => remove(&map, &target),
+        Command::Select() => select(&map),
+    };
+    leave_database(map);
 }
