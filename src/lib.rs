@@ -1,38 +1,35 @@
-pub enum Instruction {
-    Insert,
-    Remove,
-    Select,
+pub enum Command {
+    Insert(String, String),
+    Remove(String),
+    Select(),
 }
 
-pub struct Command {
-    pub instruction: Instruction,
-    pub target: String,
-    pub value: Option<String>,
-}
-
-// args must looks like this : ["/target/...", "INSTRUCTION", "value" if the user put one]
+// args must looks like this : ["/target/...", "INSTRUCTION", "Target", "value" if the user put one]
 pub fn parse_args(args: Vec<String>) -> Result<Command, &'static str> {
-    if args.len() < 3 {
+    let len_args = args.len();
+    if len_args < 3 {
         return Err("Not enough arguments, usage : rkv [INSTRUCTION] [Target] value");
     }
 
-    let config: Instruction = match args[1].as_str() {
-        "INSERT" => Instruction::Insert,
-        "REMOVE" => Instruction::Remove,
-        "SELECT" => Instruction::Select,
+    let target = args[2].clone();
+    //args[1] is the instruction
+    match args[1].as_str() {
+        "INSERT" => match args.len() {
+            4 => Ok(Command::Insert(target, args[3].clone())),
+            _ => Err("Not enough arguments, you need a target AND a value for INSERT."),
+        },
+        "REMOVE" => Ok(Command::Remove(target)),
+
+        "SELECT" => Ok(Command::Select()),
+
         _ => {
             return Err(
                 "Not a valid instruction, rkv --help, (maybe the instruction is not in caps)",
             );
         }
-    };
-
-    Ok(Command {
-        instruction: config,
-        target: args[2].clone(),
-        value: Some(args[3].clone()),
-    })
+    }
 }
+
 pub fn insert(target: &str, value: &str) {
     unimplemented!()
 }
