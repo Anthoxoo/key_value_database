@@ -3,7 +3,7 @@
 This cli is a key-value database *mono table* written in rust.
 
 
-*3 operations are possible (for the moment) : *
+**3 operations are possible (for the moment) :**
   - INSERT : insert a key associated with a value in the database ( be careful, a key can only be in the database once or it'll be overwritten by the next same key ).
     usage: INSERT key value
   - REMOVE : remove a key and a value from the database using only the key.
