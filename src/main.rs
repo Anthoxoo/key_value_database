@@ -17,9 +17,10 @@ fn main() {
     let mut map = database_to_map();
 
     map = match command {
-        Command::Insert(target, value) => insert(&map, &target, &value),
-        Command::Remove(target) => remove(&map, &target),
-        Command::Select() => select(&map),
+        Command::Insert(key, value) => insert(map, &key, &value),
+        Command::Remove(key) => remove(map, &key),
+        Command::Select(target) => select(map, &target),
     };
+
     leave_database(map);
 }

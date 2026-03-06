@@ -1,14 +1,10 @@
-use std::{
-    collections::{HashMap, hash_map::ValuesMut},
-    fs::File,
-    io::Write,
-    process,
-};
+use std::io::stdin;
+use std::{collections::HashMap, fs::File, io::Write, process};
 
 pub enum Command {
     Insert(String, String),
     Remove(String),
-    Select(),
+    Select(String),
 }
 
 // args must looks like this : ["/target/...", "INSTRUCTION", "Target", "value" if the user put one]
@@ -23,11 +19,18 @@ pub fn parse_args(args: Vec<String>) -> Result<Command, &'static str> {
     match args[1].as_str() {
         "INSERT" => match args.len() {
             4 => Ok(Command::Insert(target, args[3].clone())),
-            _ => Err("Not enough arguments, you need a target AND a value for INSERT."),
+            _ => Err("Not a valid number of arguments, Usage: INSERT key value"),
         },
-        "REMOVE" => Ok(Command::Remove(target)),
 
-        "SELECT" => Ok(Command::Select()),
+        "REMOVE" => match args.len() {
+            3 => Ok(Command::Remove(target)),
+            _ => Err("Not a valid number of arguments, Usage: REMOVE key"),
+        },
+
+        "SELECT" => match args.len() {
+            3 => Ok(Command::Select(target)),
+            _ => Err("Not a valid number of arguments, Usage: SELECT key/operator"),
+        },
 
         _ => {
             return Err("Not a valid instruction hint:(maybe the instruction is not in caps)");
@@ -53,7 +56,7 @@ pub fn database_to_map() -> HashMap<String, String> {
         }
     }
 
-    map
+    return map;
 }
 
 pub fn leave_database(map: HashMap<String, String>) {
@@ -70,19 +73,47 @@ pub fn leave_database(map: HashMap<String, String>) {
     process::exit(0);
 }
 
-pub fn insert(
-    mut map: &HashMap<String, String>,
-    target: &str,
-    value: &str,
-) -> HashMap<String, String> {
-    todo!("Send a warning message because we can only have the same key once in the map");
-    unimplemented!()
+pub fn insert(mut map: HashMap<String, String>, key: &str, value: &str) -> HashMap<String, String> {
+    if map.contains_key(key) {
+        println!(
+            "Your database already contains this key and can only be in it once. Are you sure you want to overide it ? (y/n)"
+        );
+
+        let mut answer = String::new();
+        stdin()
+            .read_line(&mut answer)
+            .expect("Error while reading the user input.");
+
+        let answer: String = answer.trim().to_lowercase();
+
+        if !answer.eq("y") {
+            process::exit(1);
+        }
+    }
+
+    map.insert(key.to_string(), value.to_string());
+
+    return map;
 }
 
-pub fn remove(mut map: &HashMap<String, String>, target: &str) -> HashMap<String, String> {
-    unimplemented!()
+pub fn remove(mut map: HashMap<String, String>, key: &str) -> HashMap<String, String> {
+    map.remove(key);
+
+    return map;
 }
 
-pub fn select(map: &HashMap<String, String>) -> HashMap<String, String> {
-    unimplemented!()
+pub fn select(map: HashMap<String, String>, target: &str) -> HashMap<String, String> {
+    if target.eq("*") {
+        for (key, value) in &map {
+            println!("{key} {value}");
+        }
+    } else {
+        for (key, value) in &map {
+            if key.eq(target) {
+                println!("{key} {value}");
+            }
+        }
+    }
+
+    return map;
 }
