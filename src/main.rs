@@ -14,7 +14,7 @@ fn main() {
         }
     };
 
-    let mut map = database_to_map();
+    let mut map = database_to_map(); // opening database
 
     map = match command {
         Command::Insert(key, value) => insert(map, &key, &value),
@@ -22,5 +22,5 @@ fn main() {
         Command::Select(target) => select(map, &target),
     };
 
-    leave_database(map);
+    leave_database(map); // closing database
 }

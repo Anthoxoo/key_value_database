@@ -1,21 +1,25 @@
 use std::io::stdin;
 use std::{collections::HashMap, fs::File, io::Write, process};
 
+/*This enum will contains the arguments used for the differents functions with the same names as the queries in the enum */
 pub enum Command {
     Insert(String, String),
     Remove(String),
     Select(String),
 }
 
-// args must looks like this : ["/target/...", "INSTRUCTION", "Target", "value" if the user put one]
 pub fn parse_args(args: Vec<String>) -> Result<Command, &'static str> {
+    /* This function parse the arguments given into the Command enum, every checking of len is +1 compared to what
+     * it is supposed to be because the first argument will always be the path of the executable.
+     * args must looks like this : ["/target/...", "INSTRUCTION", "Target", "value" if the user put one] */
+
     let len_args = args.len();
     if len_args < 3 {
         return Err("Not enough arguments, usage : rkv [INSTRUCTION] [Target] value");
     }
 
     let target = args[2].clone();
-    //args[1] is the instruction
+
     match args[1].as_str() {
         "INSERT" => match args.len() {
             4 => Ok(Command::Insert(target, args[3].clone())),
@@ -32,13 +36,13 @@ pub fn parse_args(args: Vec<String>) -> Result<Command, &'static str> {
             _ => Err("Not a valid number of arguments, Usage: SELECT key/operator"),
         },
 
-        _ => {
-            return Err("Not a valid instruction hint:(maybe the instruction is not in caps)");
-        }
+        _ => Err("Not a valid instruction hint:(maybe the instruction is not in caps)"),
     }
 }
 
 pub fn database_to_map() -> HashMap<String, String> {
+    /*This function read the database.txt file and transpose it into a Hashmap called map. */
+
     let mut map = HashMap::new();
 
     let content = match std::fs::read_to_string("database.txt") {
@@ -56,12 +60,12 @@ pub fn database_to_map() -> HashMap<String, String> {
         }
     }
 
-    return map;
+    map
 }
 
 pub fn leave_database(map: HashMap<String, String>) {
     /*In this function we will retrive all the informations into the database.txt file, we will erase the old one and write on top with
-     * the hasmap we have.
+     * the hashmap we have.
      */
 
     let mut db = File::create("database.txt").expect("Error creating the database.txt file");
@@ -74,12 +78,15 @@ pub fn leave_database(map: HashMap<String, String>) {
 }
 
 pub fn insert(mut map: HashMap<String, String>, key: &str, value: &str) -> HashMap<String, String> {
+    /* This function insert the given value in the hashmap (=our current database) and checks if the key is already in it, if so we give a warning. */
+
     if map.contains_key(key) {
         println!(
             "Your database already contains this key and can only be in it once. Are you sure you want to overide it ? (y/n)"
         );
 
         let mut answer = String::new();
+
         stdin()
             .read_line(&mut answer)
             .expect("Error while reading the user input.");
@@ -93,16 +100,22 @@ pub fn insert(mut map: HashMap<String, String>, key: &str, value: &str) -> HashM
 
     map.insert(key.to_string(), value.to_string());
 
-    return map;
+    map
 }
 
 pub fn remove(mut map: HashMap<String, String>, key: &str) -> HashMap<String, String> {
+    /* This function removes the key given from the hashmap. */
+
     map.remove(key);
 
-    return map;
+    map
 }
 
 pub fn select(map: HashMap<String, String>, target: &str) -> HashMap<String, String> {
+    /* This function prints the target value if it is in the hashmap, if the star argument (*) is given we print everythings.
+     * To use the star argument you must put a backslash (\*) behind so the shell does not intrepret it as his metacaracter.
+     */
+
     if target.eq("*") {
         for (key, value) in &map {
             println!("{key} {value}");
@@ -115,5 +128,5 @@ pub fn select(map: HashMap<String, String>, target: &str) -> HashMap<String, Str
         }
     }
 
-    return map;
+    map
 }
