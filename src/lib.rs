@@ -1,4 +1,9 @@
-use std::collections::HashMap;
+use std::{
+    collections::{HashMap, hash_map::ValuesMut},
+    fs::File,
+    io::Write,
+    process,
+};
 
 pub enum Command {
     Insert(String, String),
@@ -55,6 +60,14 @@ pub fn leave_database(map: HashMap<String, String>) {
     /*In this function we will retrive all the informations into the database.txt file, we will erase the old one and write on top with
      * the hasmap we have.
      */
+
+    let mut db = File::create("database.txt").expect("Error creating the database.txt file");
+
+    for (key, value) in map {
+        writeln!(db, "{key} {value}").expect("Error writing in the database.txt file");
+    }
+
+    process::exit(0);
 }
 
 pub fn insert(
