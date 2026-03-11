@@ -6,36 +6,49 @@ pub enum Command {
     Insert(String, String),
     Remove(String),
     Select(String),
+    Drop(),
 }
 
 pub fn parse_args(args: Vec<String>) -> Result<Command, &'static str> {
     /* This function parse the arguments given into the Command enum, every checking of len is +1 compared to what
      * it is supposed to be because the first argument will always be the path of the executable.
-     * args must looks like this : ["/target/...", "INSTRUCTION", "Target", "value" if the user put one] */
+     * args must looks like this : ["/target/...", "INSTRUCTION", "Target" if the user put one , "value" if the user put one] */
 
     let len_args = args.len();
-    if len_args < 3 {
-        return Err("Not enough arguments, usage : rkv [INSTRUCTION] [Target] value");
+
+    if len_args < 2 {
+        return Err("Not enough arguments, usage : rkv [INSTRUCTION] target value");
     }
 
-    let target = args[2].clone();
-
     match args[1].as_str() {
-        "INSERT" => match args.len() {
-            4 => Ok(Command::Insert(target, args[3].clone())),
+        "INSERT" => match len_args {
+            4 => {
+                let target = args[2].clone();
+                Ok(Command::Insert(target, args[3].clone()))
+            }
             _ => Err("Not a valid number of arguments, Usage: INSERT key value"),
         },
 
-        "REMOVE" => match args.len() {
-            3 => Ok(Command::Remove(target)),
+        "REMOVE" => match len_args {
+            3 => {
+                let target = args[2].clone();
+                Ok(Command::Remove(target))
+            }
             _ => Err("Not a valid number of arguments, Usage: REMOVE key"),
         },
 
-        "SELECT" => match args.len() {
-            3 => Ok(Command::Select(target)),
+        "SELECT" => match len_args {
+            3 => {
+                let target = args[2].clone();
+                Ok(Command::Select(target))
+            }
             _ => Err("Not a valid number of arguments, Usage: SELECT key/operator"),
         },
 
+        "DROP" => match len_args {
+            2 => Ok(Command::Drop()),
+            _ => Err("Not a valid number of arguments, Usage: DROP"),
+        },
         _ => Err("Not a valid instruction hint:(maybe the instruction is not in caps)"),
     }
 }
@@ -77,7 +90,7 @@ pub fn leave_database(map: HashMap<String, String>) {
     process::exit(0);
 }
 
-pub fn insert(mut map: HashMap<String, String>, key: &str, value: &str) -> HashMap<String, String> {
+pub fn insert(map: &mut HashMap<String, String>, key: &str, value: &str) {
     /* This function insert the given value in the hashmap (=our current database) and checks if the key is already in it, if so we give a warning. */
 
     if map.contains_key(key) {
@@ -99,34 +112,46 @@ pub fn insert(mut map: HashMap<String, String>, key: &str, value: &str) -> HashM
     }
 
     map.insert(key.to_string(), value.to_string());
-
-    map
 }
 
-pub fn remove(mut map: HashMap<String, String>, key: &str) -> HashMap<String, String> {
+pub fn remove(map: &mut HashMap<String, String>, key: &str) {
     /* This function removes the key given from the hashmap. */
 
     map.remove(key);
-
-    map
 }
 
-pub fn select(map: HashMap<String, String>, target: &str) -> HashMap<String, String> {
+pub fn select(map: &HashMap<String, String>, target: &str) {
     /* This function prints the target value if it is in the hashmap, if the star argument (*) is given we print everythings.
      * To use the star argument you must put a backslash (\*) behind so the shell does not intrepret it as his metacaracter.
      */
 
     if target.eq("*") {
-        for (key, value) in &map {
+        for (key, value) in map {
             println!("{key} {value}");
         }
     } else {
-        for (key, value) in &map {
+        for (key, value) in map {
             if key.eq(target) {
                 println!("{key} {value}");
             }
         }
     }
+}
 
-    map
+pub fn drop_database(map: &mut HashMap<String, String>) {
+    println!("Are you sure you want to delete the database content ? (y/n)");
+
+    let mut answer = String::new();
+
+    stdin()
+        .read_line(&mut answer)
+        .expect("Error while reading the user input.");
+
+    let answer: String = answer.trim().to_lowercase();
+
+    if !answer.eq("y") {
+        process::exit(1);
+    }
+
+    map.clear()
 }
