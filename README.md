@@ -10,5 +10,6 @@ This cli is a key-value database *mono table* written in rust.
     usage: REMOVE key
   - SELECT : you can either choose to select from a key existent or not or you can choose to use the star operator (*), for this one you will need to use a backslash behind it so the shell does not recognize it as his metacaracter.
     (usage: SELECT key) or (usage: SELECT \*)
+  - DROP : clears the database
   
   TODO: If time make the database multi tables --> multiples txt files.
