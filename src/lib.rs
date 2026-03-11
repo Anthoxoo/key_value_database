@@ -112,12 +112,16 @@ pub fn insert(map: &mut HashMap<String, String>, key: &str, value: &str) {
     }
 
     map.insert(key.to_string(), value.to_string());
+
+    println!("Your value has been succesfully inserted into the database.")
 }
 
 pub fn remove(map: &mut HashMap<String, String>, key: &str) {
     /* This function removes the key given from the hashmap. */
 
     map.remove(key);
+
+    println!("Your value has been succesfully removed from the database.")
 }
 
 pub fn select(map: &HashMap<String, String>, target: &str) {
@@ -153,5 +157,7 @@ pub fn drop_database(map: &mut HashMap<String, String>) {
         process::exit(1);
     }
 
-    map.clear()
+    map.clear();
+
+    println!("Your database has been succesfully cleared.")
 }
