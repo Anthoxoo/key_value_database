@@ -11,4 +11,4 @@ This cli is a key-value database *mono table* written in rust.
   - SELECT : you can either choose to select from a key existent or not or you can choose to use the star operator (*), for this one you will need to use a backslash behind it so the shell does not recognize it as his metacaracter.
     (usage: SELECT key) or (usage: SELECT \*)
   
-  TODO: make a drop command so it clears the database. If time make the database multi tables --> multiples txt files.
+  TODO: If time make the database multi tables --> multiples txt files.
