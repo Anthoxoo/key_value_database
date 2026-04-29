@@ -106,7 +106,7 @@ pub fn insert(map: &mut HashMap<String, String>, key: &str, value: &str) {
 
         let answer: String = answer.trim().to_lowercase();
 
-        if !answer.eq("y") {
+        if !answer.eq("n") {
             process::exit(1);
         }
     }
